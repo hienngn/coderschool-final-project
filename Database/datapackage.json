@@ -1,0 +1,20 @@
+{
+  "keywords": [
+    "bri", 
+    "cosmetics", 
+    "dg-enterprise", 
+    "eu", 
+    "european-commission", 
+    "european-union", 
+    "eutransparency", 
+    "side-effects"
+  ], 
+  "sources": [
+    {
+      "web": "http://ec.europa.eu/enterprise/cosmetics/cosing/"
+    }
+  ], 
+  "description": "CosIng is the European Commission database with information on cosmetic ingredients contained in the \"Cosmetics Directive\" 76/768/EEC.\r\nIncludes scientific evaluation on chemical substances in cosmetics and hair dying including toxocological evaluation. ", 
+  "name": "cosing", 
+  "title": "cosmetics database cosing"
+}

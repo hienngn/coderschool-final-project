@@ -1,0 +1,66 @@
+2020-10-12 15:25:19,992 [38148] DEBUG    root:75: [JupyterRequire] Loading Jupyter Require extension.
+2020-10-12 15:25:19,992 [38148] DEBUG    root:93: [JupyterRequire] Initializing comms.
+2020-10-12 15:25:19,992 [38148] INFO     root:247: [JupyterRequire] Initializing comms.
+2020-10-12 15:25:19,995 [38148] DEBUG    root:197: [JupyterRequire] Configuration requested: {'paths': {}, 'shim': None}
+2020-10-12 15:25:19,996 [38148] INFO     root:271: [JupyterRequire] Comms have been successfully initialized.
+2020-10-12 15:25:19,996 [38148] DEBUG    root:97: [JupyterRequire] Registering comm targets.
+2020-10-12 15:25:20,512 [38148] DEBUG    root:75: [JupyterRequire] Loading Jupyter Require extension.
+2020-10-12 15:25:20,512 [38148] DEBUG    root:93: [JupyterRequire] Initializing comms.
+2020-10-12 15:25:20,512 [38148] INFO     root:247: [JupyterRequire] Initializing comms.
+2020-10-12 15:25:20,515 [38148] DEBUG    root:197: [JupyterRequire] Configuration requested: {'paths': {}, 'shim': None}
+2020-10-12 15:25:20,515 [38148] INFO     root:271: [JupyterRequire] Comms have been successfully initialized.
+2020-10-12 15:25:20,516 [38148] DEBUG    root:97: [JupyterRequire] Registering comm targets.
+2020-10-12 15:25:24,702 [38169] DEBUG    root:75: [JupyterRequire] Loading Jupyter Require extension.
+2020-10-12 15:25:24,703 [38169] DEBUG    root:93: [JupyterRequire] Initializing comms.
+2020-10-12 15:25:24,703 [38169] INFO     root:247: [JupyterRequire] Initializing comms.
+2020-10-12 15:25:24,706 [38169] DEBUG    root:197: [JupyterRequire] Configuration requested: {'paths': {}, 'shim': None}
+2020-10-12 15:25:24,706 [38169] INFO     root:271: [JupyterRequire] Comms have been successfully initialized.
+2020-10-12 15:25:24,707 [38169] DEBUG    root:97: [JupyterRequire] Registering comm targets.
+2020-10-12 16:31:16,135 [38148] DEBUG    urllib3.connectionpool:943: [JupyterRequire] Starting new HTTPS connection (1): incidecoder.com:443
+2020-10-12 16:31:20,012 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] https://incidecoder.com:443 "GET /sitemap-ingredients.0.xml HTTP/1.1" 200 None
+2020-10-12 16:43:44,827 [38148] DEBUG    urllib3.connectionpool:943: [JupyterRequire] Starting new HTTPS connection (1): incidecoder.com:443
+2020-10-12 16:43:45,563 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] https://incidecoder.com:443 "GET /ingredients/niacinamide HTTP/1.1" 200 None
+2020-10-12 16:44:07,721 [38148] DEBUG    urllib3.connectionpool:943: [JupyterRequire] Starting new HTTPS connection (1): incidecoder.com:443
+2020-10-12 16:44:08,399 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] https://incidecoder.com:443 "GET /ingredients/niacinamide HTTP/1.1" 200 None
+2020-10-12 16:46:01,336 [38148] DEBUG    urllib3.connectionpool:943: [JupyterRequire] Starting new HTTPS connection (1): incidecoder.com:443
+2020-10-12 16:46:02,057 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] https://incidecoder.com:443 "GET /ingredients/niacinamide HTTP/1.1" 200 None
+2020-10-12 17:08:54,016 [38148] DEBUG    selenium.webdriver.remote.remote_connection:388: [JupyterRequire] POST http://127.0.0.1:62616/session {"capabilities": {"firstMatch": [{}], "alwaysMatch": {"browserName": "chrome", "platformName": "any", "goog:chromeOptions": {"extensions": [], "binary": "/usr/bin/chromium-browser", "args": ["--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}}, "desiredCapabilities": {"browserName": "chrome", "version": "", "platform": "ANY", "goog:chromeOptions": {"extensions": [], "binary": "/usr/bin/chromium-browser", "args": ["--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}}
+2020-10-12 17:08:54,027 [38148] DEBUG    urllib3.connectionpool:230: [JupyterRequire] Starting new HTTP connection (1): 127.0.0.1:62616
+2020-10-12 17:08:54,032 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] http://127.0.0.1:62616 "POST /session HTTP/1.1" 500 1762
+2020-10-12 17:08:54,033 [38148] DEBUG    selenium.webdriver.remote.remote_connection:440: [JupyterRequire] Finished Request
+2020-10-12 17:12:49,200 [38148] DEBUG    selenium.webdriver.remote.remote_connection:388: [JupyterRequire] POST http://127.0.0.1:62713/session {"capabilities": {"firstMatch": [{}], "alwaysMatch": {"browserName": "chrome", "platformName": "any", "goog:chromeOptions": {"extensions": [], "binary": "/usr/local/bin/chromium-browser", "args": ["--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}}, "desiredCapabilities": {"browserName": "chrome", "version": "", "platform": "ANY", "goog:chromeOptions": {"extensions": [], "binary": "/usr/local/bin/chromium-browser", "args": ["--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}}
+2020-10-12 17:12:49,209 [38148] DEBUG    urllib3.connectionpool:230: [JupyterRequire] Starting new HTTP connection (1): 127.0.0.1:62713
+2020-10-12 17:12:49,213 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] http://127.0.0.1:62713 "POST /session HTTP/1.1" 500 1768
+2020-10-12 17:12:49,213 [38148] DEBUG    selenium.webdriver.remote.remote_connection:440: [JupyterRequire] Finished Request
+2020-10-12 17:14:02,046 [38148] DEBUG    selenium.webdriver.remote.remote_connection:388: [JupyterRequire] POST http://127.0.0.1:62756/session {"capabilities": {"firstMatch": [{}], "alwaysMatch": {"browserName": "chrome", "platformName": "any", "goog:chromeOptions": {"extensions": [], "args": ["--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}}, "desiredCapabilities": {"browserName": "chrome", "version": "", "platform": "ANY", "goog:chromeOptions": {"extensions": [], "args": ["--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}}
+2020-10-12 17:14:02,057 [38148] DEBUG    urllib3.connectionpool:230: [JupyterRequire] Starting new HTTP connection (1): 127.0.0.1:62756
+2020-10-12 17:14:02,562 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] http://127.0.0.1:62756 "POST /session HTTP/1.1" 200 726
+2020-10-12 17:14:02,563 [38148] DEBUG    selenium.webdriver.remote.remote_connection:440: [JupyterRequire] Finished Request
+2020-10-12 17:14:02,564 [38148] DEBUG    selenium.webdriver.remote.remote_connection:388: [JupyterRequire] POST http://127.0.0.1:62756/session/142992f70d4c146e8854df303cfe7c66/url {"url": "https://api.ipify.org/?format=json"}
+2020-10-12 17:14:03,729 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] http://127.0.0.1:62756 "POST /session/142992f70d4c146e8854df303cfe7c66/url HTTP/1.1" 200 14
+2020-10-12 17:14:03,729 [38148] DEBUG    selenium.webdriver.remote.remote_connection:440: [JupyterRequire] Finished Request
+2020-10-12 17:14:03,730 [38148] DEBUG    selenium.webdriver.remote.remote_connection:388: [JupyterRequire] GET http://127.0.0.1:62756/session/142992f70d4c146e8854df303cfe7c66/source {}
+2020-10-12 17:14:03,735 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] http://127.0.0.1:62756 "GET /session/142992f70d4c146e8854df303cfe7c66/source HTTP/1.1" 200 185
+2020-10-12 17:14:03,736 [38148] DEBUG    selenium.webdriver.remote.remote_connection:440: [JupyterRequire] Finished Request
+2020-10-12 17:16:23,317 [38148] DEBUG    selenium.webdriver.remote.remote_connection:388: [JupyterRequire] POST http://127.0.0.1:62756/session/142992f70d4c146e8854df303cfe7c66/url {"url": "https://incidecoder.com/ingredients/niacinamide"}
+2020-10-12 17:16:26,136 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] http://127.0.0.1:62756 "POST /session/142992f70d4c146e8854df303cfe7c66/url HTTP/1.1" 200 14
+2020-10-12 17:16:26,136 [38148] DEBUG    selenium.webdriver.remote.remote_connection:440: [JupyterRequire] Finished Request
+2020-10-12 17:16:26,136 [38148] DEBUG    selenium.webdriver.remote.remote_connection:388: [JupyterRequire] GET http://127.0.0.1:62756/session/142992f70d4c146e8854df303cfe7c66/source {}
+2020-10-12 17:16:26,158 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] http://127.0.0.1:62756 "GET /session/142992f70d4c146e8854df303cfe7c66/source HTTP/1.1" 200 101553
+2020-10-12 17:16:26,160 [38148] DEBUG    selenium.webdriver.remote.remote_connection:440: [JupyterRequire] Finished Request
+2020-10-12 18:03:29,386 [38148] DEBUG    urllib3.connectionpool:943: [JupyterRequire] Starting new HTTPS connection (1): incidecoder.com:443
+2020-10-12 18:03:30,503 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] https://incidecoder.com:443 "GET /ingredients/niacinamide HTTP/1.1" 200 None
+2020-10-12 18:16:40,364 [38148] DEBUG    urllib3.connectionpool:943: [JupyterRequire] Starting new HTTPS connection (1): incidecoder.com:443
+2020-10-12 18:16:41,264 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] https://incidecoder.com:443 "GET /ingredients/niacinamide HTTP/1.1" 200 None
+2020-10-12 18:56:11,129 [38148] DEBUG    selenium.webdriver.remote.remote_connection:388: [JupyterRequire] POST http://127.0.0.1:62756/session/142992f70d4c146e8854df303cfe7c66/url {"url": "https://incidecoder.com/ingredients/niacinamide"}
+2020-10-12 18:56:12,594 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] http://127.0.0.1:62756 "POST /session/142992f70d4c146e8854df303cfe7c66/url HTTP/1.1" 200 14
+2020-10-12 18:56:12,595 [38148] DEBUG    selenium.webdriver.remote.remote_connection:440: [JupyterRequire] Finished Request
+2020-10-12 18:56:12,596 [38148] DEBUG    selenium.webdriver.remote.remote_connection:388: [JupyterRequire] GET http://127.0.0.1:62756/session/142992f70d4c146e8854df303cfe7c66/source {}
+2020-10-12 18:56:12,700 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] http://127.0.0.1:62756 "GET /session/142992f70d4c146e8854df303cfe7c66/source HTTP/1.1" 200 101552
+2020-10-12 18:56:12,703 [38148] DEBUG    selenium.webdriver.remote.remote_connection:440: [JupyterRequire] Finished Request
+2020-10-13 00:12:49,729 [38148] DEBUG    urllib3.connectionpool:943: [JupyterRequire] Starting new HTTPS connection (1): incidecoder.com:443
+2020-10-13 00:12:50,558 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] https://incidecoder.com:443 "GET /ingredients/panthenol HTTP/1.1" 200 None
+2020-10-13 00:13:09,788 [38148] DEBUG    urllib3.connectionpool:943: [JupyterRequire] Starting new HTTPS connection (1): incidecoder.com:443
+2020-10-13 00:13:11,876 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] https://incidecoder.com:443 "GET /ingredients/panthenol HTTP/1.1" 200 None
+2020-10-13 00:13:19,703 [38148] DEBUG    urllib3.connectionpool:943: [JupyterRequire] Starting new HTTPS connection (1): incidecoder.com:443
+2020-10-13 00:13:20,394 [38148] DEBUG    urllib3.connectionpool:442: [JupyterRequire] https://incidecoder.com:443 "GET /ingredients/panthenol HTTP/1.1" 200 None
