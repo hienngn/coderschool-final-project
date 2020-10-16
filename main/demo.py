@@ -96,7 +96,7 @@ def main(argv=None):
                 scores = textsegs[:, 0]
                 textsegs = textsegs[:, 1:5]
 
-                textdetector = TextDetector(DETECT_MODE='H')
+                textdetector = TextDetector(DETECT_MODE='O')
                 boxes = textdetector.detect(textsegs, scores[:, np.newaxis], img.shape[:2])
                 boxes = np.array(boxes, dtype=np.int)
 
