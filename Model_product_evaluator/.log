@@ -1791,3 +1791,6 @@
 2020-10-19 11:10:28,531 [82247] DEBUG    root:197: [JupyterRequire] Configuration requested: {'paths': {}, 'shim': None}
 2020-10-19 11:10:28,534 [82247] INFO     root:271: [JupyterRequire] Comms have been successfully initialized.
 2020-10-19 11:10:28,536 [82247] DEBUG    root:97: [JupyterRequire] Registering comm targets.
+2020-10-19 13:51:01,396 [82247] WARNING  py.warnings:110: [JupyterRequire] /Users/macbookpro/miniconda3/envs/cs_ftmle/lib/python3.7/site-packages/IPython/core/interactiveshell.py:3072: DtypeWarning: Columns (5) have mixed types.Specify dtype option on import or set low_memory=False.
+  interactivity=interactivity, compiler=compiler, result=result)
+
