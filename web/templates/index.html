@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='flex flex-column w-100'>
+  <div class='w-50 ph3 center off-white-bg avenir'>
+    <h1 class='f-headline-l f1-m f2'><span class='oren'>BO</span><span class='blu'>MB</span></h1>
+    <h2 class='f1-l f2-m f3'><span class='coral'>BE MORE</span> <span class='light-blu'>ORGANICALLY BEAUTIFUL</span></h2>
+
+    <h3 class='f2-ns f3'>Let's decode ingredient lists</h3>
+    <input type="file" name="file" id='file'/>
+    <button class='br1 ph3 pv2 input-reset ba blu b--purple bg-transparent pointer dib' id='submitBtn' value="">Upload Image</button>
+
+    <hr/>
+    <img id='prodpic' style='display:none;max-width:500px;' src=''/>
+    <h3 class='f3' id='result'></h3>
+  </div>
+</div>
+{% endblock %}
