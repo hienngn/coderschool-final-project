@@ -4223,3 +4223,21 @@
 2020-10-21 16:03:01,051 [1979] DEBUG    matplotlib.colorbar:600: [JupyterRequire] locator: <matplotlib.colorbar._ColorbarAutoLocator object at 0x11fb296d0>
 2020-10-21 16:03:01,054 [1979] DEBUG    matplotlib.colorbar:645: [JupyterRequire] Using auto colorbar locator <matplotlib.colorbar._ColorbarAutoLocator object at 0x11fb296d0> on colorbar
 2020-10-21 16:03:01,054 [1979] DEBUG    matplotlib.colorbar:799: [JupyterRequire] Setting pcolormesh
+2020-10-21 21:12:15,021 [32572] DEBUG    root:75: [JupyterRequire] Loading Jupyter Require extension.
+2020-10-21 21:12:15,022 [32572] DEBUG    root:93: [JupyterRequire] Initializing comms.
+2020-10-21 21:12:15,022 [32572] INFO     root:247: [JupyterRequire] Initializing comms.
+2020-10-21 21:12:15,029 [32572] DEBUG    root:197: [JupyterRequire] Configuration requested: {'paths': {}, 'shim': None}
+2020-10-21 21:12:15,029 [32572] INFO     root:271: [JupyterRequire] Comms have been successfully initialized.
+2020-10-21 21:12:15,030 [32572] DEBUG    root:97: [JupyterRequire] Registering comm targets.
+2020-10-21 21:12:15,836 [32572] DEBUG    root:75: [JupyterRequire] Loading Jupyter Require extension.
+2020-10-21 21:12:15,836 [32572] DEBUG    root:93: [JupyterRequire] Initializing comms.
+2020-10-21 21:12:15,837 [32572] INFO     root:247: [JupyterRequire] Initializing comms.
+2020-10-21 21:12:15,840 [32572] DEBUG    root:197: [JupyterRequire] Configuration requested: {'paths': {}, 'shim': None}
+2020-10-21 21:12:15,841 [32572] INFO     root:271: [JupyterRequire] Comms have been successfully initialized.
+2020-10-21 21:12:15,841 [32572] DEBUG    root:97: [JupyterRequire] Registering comm targets.
+2020-10-21 22:54:34,559 [74231] DEBUG    root:75: [JupyterRequire] Loading Jupyter Require extension.
+2020-10-21 22:54:34,559 [74231] DEBUG    root:93: [JupyterRequire] Initializing comms.
+2020-10-21 22:54:34,559 [74231] INFO     root:247: [JupyterRequire] Initializing comms.
+2020-10-21 22:54:34,564 [74231] DEBUG    root:197: [JupyterRequire] Configuration requested: {'paths': {}, 'shim': None}
+2020-10-21 22:54:34,566 [74231] INFO     root:271: [JupyterRequire] Comms have been successfully initialized.
+2020-10-21 22:54:34,566 [74231] DEBUG    root:97: [JupyterRequire] Registering comm targets.
