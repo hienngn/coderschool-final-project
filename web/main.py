@@ -64,9 +64,12 @@ def predict():
         return jsonify({})
 
     img, fullpath = process_img(img_raw, ext(fname))
-    # dewarped_img_path = page_dewarp(fullpath, output_path=UPLOAD_FOLDER)
-    ctpn_img, ctpn_txt = ctpn(fullpath)
-    return jsonify({'filename': ctpn_img})
+    dewarped_img_path = page_dewarp(fullpath, output_path=UPLOAD_FOLDER)
+    ctpn_img, ctpn_txt = ctpn(dewarped_img_path)
+    res, model_out = ocr_everything(dewarped_img_path, ctpn_txt, 'db/ingredient_inci_1570.csv', 'db/ingredient_cosing_37309.csv', 'db/ingredient_vietnamese_3818.csv', 'English', debug=True)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(res)
+    return jsonify({'filename': ctpn_img, 'res': res.to_json()})
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -1426,70 +1429,7 @@ def lookup_all_vietnamese(ingredient_list, match_dict_cmd, match_dict_cosing,
     return df_res
 
 # OK THE GREAT OCR FUNCTION
-def ocr_everything(img_path, boundingtxt_file, inci_path, cmd_path, cosing_path, language, debug=False):
-    boxes = get_bounding_box(boundingtxt_file)
 
-    # doing OCR
-    text = ''
-    for box in boxes:
-        cropped = crop_line(img_path, box)
-        string = ocr(cropped)
-        text = text + ' ' + str(string.strip('\n').strip('\x0c').strip())
-
-    if debug:
-        print(text)
-
-    # Cleaning result from OCR
-    text_result = clean_string(text)
-    ing_list = string_to_list(text_result)
-
-    if debug:
-        print("-----")
-        print(text_result)
-
-    # Loading ingredient dataframe
-
-    df_cosing = pd.read_csv(cosing_path) # '../Database/ingredient_cosing_37309.csv'
-    # fd_cosing
-    cosing_dict = {name.strip(): name.strip() for name in df_cosing['ingredient_name']}
-    fd_cosing = FuzzyDict(cosing_dict, cutoff=.6)
-    match_dict_cosing = fuzzy_match_ingredients(ing_list, fd_cosing)
-
-    # Input for later models: KNN and randomforest
-    model_input = [[name for name in match_dict_cosing.values()]]
-
-    # fd main
-    if language == 'Vietnamese':
-        df_cmd = pd.read_csv(cmd_path) # Vietnamese database
-        cmd_dict = {name.strip(): name.strip() for name in df_cmd['ingredient_name']}
-        fd_cmd = FuzzyDict(cmd_dict, cutoff=.7)
-        match_dict_fuzzy = fuzzy_match_ingredients(ing_list, fd_cmd)
-
-    else:
-        df_inci = pd.read_csv(inci_path) # '../Database/CALLMEDUY/ingredient_vietnamese_3818.csv'
-        inci_dict = {name.strip(): name.strip() for name in df_inci['ingredient_name']}
-        fd_inci = FuzzyDict(inci_dict, cutoff=.7)
-        match_dict_fuzzy = fuzzy_match_ingredients(ing_list, fd_inci)
-
-    # Compare product ingredient list and database
-    # match_dict = find_matching_ingredient(ing_list, rating, 0.55)
-
-    if debug:
-        print(match_dict_fuzzy)
-        print(list(match_dict_fuzzy.values()))
-
-    if debug:
-        print("length match_dict_fuzzy", len(match_dict_fuzzy))
-        print("length match_dict_extra", len(match_dict_cosing))
-
-    # Analyzing ingredient
-    if language == 'Vietnamese':
-        df_res = lookup_all_vietnamese(ing_list, match_dict_fuzzy, match_dict_cosing, df_cmd, df_cosing)
-
-    else:
-        df_res = lookup_all_english(ing_list, match_dict_fuzzy, match_dict_cosing, df_inci, df_cosing)
-
-    return df_res, model_input
 
 
 if __name__ == '__main__':

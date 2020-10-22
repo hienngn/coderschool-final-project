@@ -1,10 +1,11 @@
-const btn = document.getElementById('submitBtn');
+const btn = document.getElementById('submitBtnEn');
 console.log("yay")
 
 btn.addEventListener('click', function (e){
   const fileInput = document.getElementById('file');
   const formData  = new FormData();
   formData.append('file', fileInput.files[0]);
+  formData.append()
 
   fetch('/predict/', {
     method: 'POST',
