@@ -26,6 +26,7 @@ function callPredict(lang) {
   $('#result').empty();
   $('#scorebox').hide();
   $('#scorearea').empty();
+  $('#suggestionsbox').empty();
   document.getElementById('prodpic').src = "";
   fetch('/predict/', {
     method: 'POST',
@@ -40,6 +41,7 @@ function callPredict(lang) {
     $('#result').append(genIngTable(data['res']));
     $('#scorebox').show();
     $('#scorearea').append(data['score']);
+    $('#suggestionsbox').append(genProds(data['recom']));
     document.getElementById('prodpic').src = data['filename'];
     document.getElementById('prodpic').style.display = "inline-block";
     hideInfoBar();
@@ -48,6 +50,7 @@ function callPredict(lang) {
       $('#result').empty();
       $('#scorebox').hide();
       $('#scorearea').empty();
+      $('#suggestionsbox').empty();
       document.getElementById('prodpic').src = "";
       document.getElementById('prodpic').style.display = "none";
       hideInfoBar();
@@ -88,6 +91,38 @@ function genIngTable(res) {
   }
   table.append(tbody);
   return table;
+}
+
+// SUGGESTIONS CODE
+function genProds(products) {
+  if (!products || products.length < 1) {
+    return "";
+  }
+  var anode = $('<div><div class="w-100 tc"><h1 class="ttu tracked f1">Suggestions for alternative products</h1></div></div>').addClass(['w-100', 'flex', 'flex-wrap']);
+  for (var i=0;i < products.length; i++) {
+    anode.append(productCard(products[i]));
+  }
+  return anode
+}
+
+function productCard(prod) {
+  var prodHTML = `
+<article class="br2 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw5 center">
+  <img src="${prod['product_img']}" class="db w-100 br2 br--top" alt="${prod['product_brand'] + " " + prod['product_name']}">
+  <div class="pa2 ph3-ns pb3-ns">
+    <div class="dt w-100 mt1">
+      <div class="dtc">
+        <h1 class="f5 f4-ns mv0">${prod['product_brand'] + " " + prod['product_name']}</h1>
+      </div>
+      <div class="dtc tr">
+        <h2 class="f5 mv0">Score: ${prod['product_score']}</h2>
+      </div>
+    </div>
+    <p class="f6 lh-copy measure mt2 mid-gray"><span class='ttu'>Ingredients:</span> ${prod['ingredient_list']}</p>
+  </div>
+</article>
+  `
+  return prodHTML;
 }
 
 // INFO BAR CODE - bottom of the screen
