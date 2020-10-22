@@ -112,7 +112,7 @@ function productCard(prod) {
   <div class="pa2 ph3-ns pb3-ns">
     <div class="dt w-100 mt1">
       <div class="dtc">
-        <a class='blu dim link' href='${prod['product_url']}'><h1 class="f5 f4-ns mv0">${prod['product_brand'] + " " + prod['product_name']}</h1></a>
+        <a target='_blank' class='blu dim link' href='${prod['product_url']}'><h1 class="f5 f4-ns mv0">${prod['product_brand'] + " " + prod['product_name']}</h1></a>
       </div>
       <div class="dtc tr">
         <h2 class="f5 mv0">Score: ${prod['product_score']}</h2>
