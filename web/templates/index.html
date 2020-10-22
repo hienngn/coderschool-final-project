@@ -13,12 +13,13 @@
       <input type="checkbox" id="dewarp" name="dewarp" checked>
       <label for="dewarp" class='f5'>Handle curved label</label>
     </div>
-    <button class='br1 ph3 pv2 input-reset ba oren b--orange bg-transparent pointer f4 dim dib' id='submitBtnEn' value="">Process English</button>
-    <button class='br1 ph3 pv2 input-reset ba blu b--purple bg-transparent pointer f4 dim dib' id='submitBtnVn' value="">Process Vietnamese</button>
+    <button class='br1 ph3 pv2 mv2 input-reset ba oren b--orange bg-transparent pointer f5 dim dib' id='submitBtnEn' value="">Process English</button>
+    <button class='br1 ph3 pv2 mv2 input-reset ba blu b--purple bg-transparent pointer f5 dim dib' id='submitBtnVn' value="">Process Vietnamese</button>
 
     <hr/>
     <img id='prodpic' style='display:none;max-width:500px;' src=''/>
     <h3 class='f3' id='result'></h3>
   </div>
 </div>
+<div id='infobar' class='avenir f4 pv2 ph3' style='display: none;'><span id='infobar_msg'></span> <div class='dib fr'><a class='link pointer dim' onclick='javascript:hideInfoBar()'>&times;</a></div></div>
 {% endblock %}

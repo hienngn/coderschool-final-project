@@ -13,3 +13,11 @@
 
 .light-blu { color: #749FC7; }
 .light-blu-bg { background-color: #749FC7; }
+
+#infobar { 
+    height: 40px; 
+    position: fixed; 
+    bottom:0%;
+    width:100%; 
+    background-color: #FDBDB2; 
+}
