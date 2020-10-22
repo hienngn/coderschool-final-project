@@ -1478,7 +1478,7 @@ def lookup_all_vietnamese(ingredient_list, match_dict_cmd, match_dict_cosing,
             else:
                 res.extend([[key, rating_score, functions, description]])
 
-    df_res = pd.DataFrame(res, columns=['Ingredient_name', 'Rating_score', 'Functions', 'Description'])
+    df_res = pd.DataFrame(res, columns=['Ingredient_name', 'Rating', 'Functions', 'Description'])
 
     return df_res
 
