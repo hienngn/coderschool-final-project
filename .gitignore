@@ -4,3 +4,5 @@
 /web/static/img/uploads/*
 */*.pyc
 web/checkpoints_mlt
+web/db/recommendation.pkl
+web/db/rf_200.pkl
