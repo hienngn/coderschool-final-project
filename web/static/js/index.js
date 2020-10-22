@@ -1,6 +1,14 @@
-const btn = document.getElementById('submitBtnEn');
+const enBtn = document.getElementById('submitBtnEn');
+const vnBtn = document.getElementById('submitBtnVn');
 
-btn.addEventListener('click', function (e){
+enBtn.addEventListener('click', function (e){
+  callPredict("English");
+})
+vnBtn.addEventListener('click', function (e){
+  callPredict("Vietnamese");
+})
+
+function callPredict(lang) {
   const fileInput = document.getElementById('file');
   const dewarpOpt = document.querySelector('#dewarp');
   const isDewarp = (dewarpOpt.checked) ? dewarpOpt.checked : false;
@@ -11,6 +19,8 @@ btn.addEventListener('click', function (e){
   } else {
     formData.append('dewarp', false);
   }
+  // Language
+  formData.append('lang', lang);
 
   showInfoBar();
   fetch('/predict/', {
@@ -34,7 +44,7 @@ btn.addEventListener('click', function (e){
       hideInfoBar();
       console.error('Error:', error);
     });
-})
+}
 
 const infobar = document.getElementById('infobar');
 function showInfoBar() {

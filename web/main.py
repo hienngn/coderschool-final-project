@@ -59,6 +59,9 @@ def predict():
 
     reqform = request.form
     dwstr = reqform.get("dewarp")
+    lgstr = reqform.get("lang")
+    lang_set = "Vietnamese" if "Vietnamese" in lgstr else "English"
+
     is_dewarp = True if "true" in dwstr else False
 
     fname = file.filename
@@ -75,9 +78,8 @@ def predict():
     else:
         dw_img_path = preprocess_for_ocr(fullpath, UPLOAD_FOLDER)
 
-    print("DEWARPED_IMAGE_PATH", dw_img_path)
     ctpn_img, ctpn_txt = ctpn(dw_img_path)
-    res, model_out = ocr_everything(dw_img_path, ctpn_txt, 'db/ingredient_inci_1570.csv', 'db/ingredient_vietnamese_3818.csv', 'db/ingredient_cosing_37309.csv', 'English', debug=True)
+    res, model_out = ocr_everything(dw_img_path, ctpn_txt, 'db/ingredient_inci_1570.csv', 'db/ingredient_vietnamese_3818.csv', 'db/ingredient_cosing_37309.csv', lang_set, debug=True)
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print("------")
         print(res)
