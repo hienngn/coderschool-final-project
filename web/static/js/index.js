@@ -23,6 +23,8 @@ function callPredict(lang) {
   formData.append('lang', lang);
 
   showInfoBar();
+  $('#result').empty();
+  document.getElementById('prodpic').src = "";
   fetch('/predict/', {
     method: 'POST',
     body: formData,
