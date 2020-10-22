@@ -2,3 +2,5 @@
 .ipynb_checkpoints
 /Model_product_evaluator/ewg_all_products_vector.csv
 /web/static/img/uploads/*
+*/*.pyc
+web/checkpoints_mlt
