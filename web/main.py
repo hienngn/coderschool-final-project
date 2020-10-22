@@ -1186,7 +1186,7 @@ def clean_string(string):
 def string_to_list(text):
     pattern = "[\|\*\_\'\{}]".format('"')
     text = re.sub(pattern, "", text)
-    split = [remove_water(x) for x in re.split("[,.]", text)]
+    split = [remove_water(x) for x in re.split("[,.©°»><~]|\s+\-\s+", text)]
 
     return split
 

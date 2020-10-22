@@ -108,7 +108,7 @@ function genProds(products) {
 function productCard(prod) {
   var prodHTML = `
 <article class="br2 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw5 center">
-  <a href='${prod['product_url']}'><img src="${prod['product_img']}" class="db w-100 br2 br--top" alt="${prod['product_brand'] + " " + prod['product_name']}">
+  <a target='_blank' href='${prod['product_url']}'><img src="${prod['product_img']}" class="db w-100 br2 br--top" alt="${prod['product_brand'] + " " + prod['product_name']}">
   <div class="pa2 ph3-ns pb3-ns">
     <div class="dt w-100 mt1">
       <div class="dtc">
