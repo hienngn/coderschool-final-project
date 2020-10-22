@@ -6,12 +6,22 @@
     <h2 class='f1-l f2-m f3'><span class='coral'>BE ORGANICALLY</span> <span class='light-blu'>MORE BEAUTIFUL</span></h2>
 
     <h3 class='f2-ns f3'>Let's decode ingredient lists</h3>
-    <input type="file" name="file" id='file'/>
-    <button class='br1 ph3 pv2 input-reset ba blu b--purple bg-transparent pointer dib' id='submitBtn' value="">Upload Image</button>
+    <div class='bt pa3 b--silver'>
+      <input type="file" name="file" id='file'/>
+    </div>
+    <div class='ba pa3 mv2 b--silver'>
+      <input type="checkbox" id="dewarp" name="dewarp" checked>
+      <label for="dewarp" class='f5'>Handle curved label</label>
+    </div>
+    <button class='br1 ph3 pv2 mv2 input-reset ba oren b--orange bg-transparent pointer f5 dim dib' id='submitBtnEn' value="">Process English</button>
+    <button class='br1 ph3 pv2 mv2 input-reset ba blu b--purple bg-transparent pointer f5 dim dib' id='submitBtnVn' value="">Process Vietnamese</button>
 
     <hr/>
     <img id='prodpic' style='display:none;max-width:500px;' src=''/>
-    <h3 class='f3' id='result'></h3>
+  </div>
+  <div class='w-100 avenir'>
+    <div class='mt2' id='result'></div>
   </div>
 </div>
+<div id='infobar' class='avenir f4 pv2 ph3' style='display: none;'><span id='infobar_msg'></span> <div class='dib fr'><a class='link pointer dim' onclick='javascript:hideInfoBar()'>&times;</a></div></div>
 {% endblock %}

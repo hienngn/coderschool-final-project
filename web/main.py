@@ -32,7 +32,7 @@ from builtins import range
 from builtins import object
 from past.utils import old_div
 
-from PIL import Image
+from PIL import Image, ImageEnhance
 
 UPLOAD_FOLDER = 'static/img/uploads/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -56,6 +56,14 @@ def index():
 @app.route('/predict/', methods=['POST'])
 def predict():
     file = request.files['file']
+
+    reqform = request.form
+    dwstr = reqform.get("dewarp")
+    lgstr = reqform.get("lang")
+    lang_set = "Vietnamese" if "Vietnamese" in lgstr else "English"
+
+    is_dewarp = True if "true" in dwstr else False
+
     fname = file.filename
     if fname == "" or not allowed_file(fname):
         return jsonify({})
@@ -64,9 +72,20 @@ def predict():
         return jsonify({})
 
     img, fullpath = process_img(img_raw, ext(fname))
-    # dewarped_img_path = page_dewarp(fullpath, output_path=UPLOAD_FOLDER)
-    ctpn_img, ctpn_txt = ctpn(fullpath)
-    return jsonify({'filename': ctpn_img})
+    dw_img_path = ""
+    if is_dewarp:
+        dw_img_path = page_dewarp(fullpath, output_path=UPLOAD_FOLDER)
+    else:
+        dw_img_path = preprocess_for_ocr(fullpath, UPLOAD_FOLDER)
+
+    ctpn_img, ctpn_txt = ctpn(dw_img_path)
+    res, model_out = ocr_everything(dw_img_path, ctpn_txt, 'db/ingredient_inci_1570.csv', 'db/ingredient_vietnamese_3818.csv', 'db/ingredient_cosing_37309.csv', lang_set, debug=True)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print("------")
+        print(res)
+
+    res = res.fillna("")
+    return jsonify({'filename': ctpn_img, 'res': res.to_dict(orient='records')})
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -83,6 +102,43 @@ def process_img(img_data, ext):
         f.write(img_data)
     return img_data, fullpath
 
+# PREPROCESS FOR OCR
+# get grayscale image
+def get_grayscale(image):
+    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# noise removal
+def remove_noise(image):
+    return cv2.GaussianBlur(image, (5, 5), 0)
+
+# thresholding
+def thresholding(image):
+    return cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 7, 4)
+
+def preprocess_for_ocr(imgfile, output_folder, enhance=1):
+    """
+    @param img: image to which the pre-processing steps being applied
+    """
+    img = cv2.imread(imgfile)
+    if enhance > 1:
+        img = Image.fromarray(img)
+        contrast = ImageEnhance.Contrast(img)
+        img = contrast.enhance(enhance)
+        img = np.asarray(img)
+
+    gray = get_grayscale(img)
+    blur = remove_noise(gray)
+    res = thresholding(blur)
+
+    img = cv2.cvtColor(res, cv2.COLOR_GRAY2BGR)
+
+    namesplit = os.path.splitext(os.path.basename(imgfile))
+    basename = namesplit[0] + "_preproc" + namesplit[1]
+    out_fullpath = os.path.join(output_folder, basename)
+
+    cv2.imwrite(out_fullpath, img)
+
+    return out_fullpath
 
 # PAGE DEWARP CODE
 # pylint: disable=E1101
@@ -1039,7 +1095,9 @@ def ctpn(imgfile):
                     cv2.polylines(img, [box[:8].astype(np.int32).reshape((-1, 1, 2))], True, color=(0, 255, 0),
                                 thickness=2)
                 img = cv2.resize(img, None, None, fx=1.0 / rh, fy=1.0 / rw, interpolation=cv2.INTER_LINEAR)
-                output_img_file = os.path.join(output_path, os.path.basename(imgfile))
+                output_split = os.path.splitext(os.path.basename(imgfile))
+                output_name = output_split[0] + "_ctpn" + output_split[1]
+                output_img_file = os.path.join(output_path, output_name)
                 cv2.imwrite(output_img_file, img[:, :, ::-1])
 
                 txt_file = os.path.join(output_path, os.path.splitext(os.path.basename(imgfile))[0]) + ".txt"
@@ -1082,11 +1140,11 @@ def get_bounding_box(txt):
 def clean_string(string):
     text = string.replace('INACTIVE INGREDIENTS:', '') # added
     text = text.replace('ACTIVE INGREDIENTS:', '') # added
-    text = text.split(':')[1]
-
+    # text = text.split(':')[1] THIS IS WRONG
+    
     pattern = "[\|\*\_\'\{}&]".format('"')
     regex = re.compile('\\\S+')
-
+    
     text = re.sub(pattern, "", text)
     text = re.sub(",, ", ", ", text)
     text = re.sub(regex, " ", text)
@@ -1174,9 +1232,7 @@ def ocr(img, oem=3, psm=6):
     @param oem: for specifying the type of Tesseract engine( default=1 for LSTM OCR Engine)
     """
     config = ('-l eng --oem {oem} --psm {psm}'.format(oem=oem, psm=psm))
-    # config = ('-l eng --tessdata-dir "/usr/share/tesseract-ocr/tessdata" --oem {oem} -- psm {psm}'.format(oem=oem,psm=psm))
     try:
-        # img = Image.fromarray(img)
         text = pytesseract.image_to_string(img, config=config)
         return text
     except:
@@ -1291,10 +1347,10 @@ def create_dict_english(df_inci, df_cosing):
     function_inci = {}
     qfacts_inci = {}
     desc_inci = {}
-
+    
     desc_cosing = {}
     function_cosing = {}
-
+    
     for idx, row in tqdm(df_inci.iterrows()):
         for name in row['ingredient_name'].split('/'):
             chem_name = name.strip()
@@ -1304,12 +1360,12 @@ def create_dict_english(df_inci, df_cosing):
             function_inci[chem_name] = row['functions']
             qfacts_inci[chem_name] = row['quick_facts']
             desc_inci[chem_name] = row['description']
-
+            
     for idx, row in tqdm(df_cosing.iterrows()):
         for name in row['ingredient_name'].split('/'):
             desc_cosing[name] = row['description']
-            function_cosing[name] = row['functions']
-
+            function_cosing[name] = row['functions']    
+    
     return rating_inci, irritancy_inci, comedogenicity_inci, function_inci, qfacts_inci, desc_inci, desc_cosing, function_cosing
 
 def lookup_all_english(ingredient_list, match_dict_inci, match_dict_cosing,
@@ -1372,9 +1428,10 @@ def lookup_all_english(ingredient_list, match_dict_inci, match_dict_cosing,
                 res.append(description)
             else:
                 res.extend([[key, functions, rating, irritancy, comedogenicity, quickfacts, description]])
-
+            
     df_res = pd.DataFrame(res, columns=['Ingredient_name', 'Functions', 'Rating', 'Irritancy',
                                         'Comedogenicity', 'Quick_facts', 'Description'])
+    
     return df_res
 
 def lookup_all_vietnamese(ingredient_list, match_dict_cmd, match_dict_cosing,
@@ -1454,7 +1511,7 @@ def ocr_everything(img_path, boundingtxt_file, inci_path, cmd_path, cosing_path,
     cosing_dict = {name.strip(): name.strip() for name in df_cosing['ingredient_name']}
     fd_cosing = FuzzyDict(cosing_dict, cutoff=.6)
     match_dict_cosing = fuzzy_match_ingredients(ing_list, fd_cosing)
-
+    print('len fd cosing:', len(fd_cosing))
     # Input for later models: KNN and randomforest
     model_input = [[name for name in match_dict_cosing.values()]]
 
@@ -1464,12 +1521,13 @@ def ocr_everything(img_path, boundingtxt_file, inci_path, cmd_path, cosing_path,
         cmd_dict = {name.strip(): name.strip() for name in df_cmd['ingredient_name']}
         fd_cmd = FuzzyDict(cmd_dict, cutoff=.7)
         match_dict_fuzzy = fuzzy_match_ingredients(ing_list, fd_cmd)
-
+        print('len fd cmd:', len(fd_cmd))
     else:
         df_inci = pd.read_csv(inci_path) # '../Database/CALLMEDUY/ingredient_vietnamese_3818.csv'
         inci_dict = {name.strip(): name.strip() for name in df_inci['ingredient_name']}
         fd_inci = FuzzyDict(inci_dict, cutoff=.7)
         match_dict_fuzzy = fuzzy_match_ingredients(ing_list, fd_inci)
+        print('len fd inci:', len(fd_inci))
 
     # Compare product ingredient list and database
     # match_dict = find_matching_ingredient(ing_list, rating, 0.55)
@@ -1477,6 +1535,7 @@ def ocr_everything(img_path, boundingtxt_file, inci_path, cmd_path, cosing_path,
     if debug:
         print(match_dict_fuzzy)
         print(list(match_dict_fuzzy.values()))
+        print(ing_list)
 
     if debug:
         print("length match_dict_fuzzy", len(match_dict_fuzzy))
@@ -1488,6 +1547,9 @@ def ocr_everything(img_path, boundingtxt_file, inci_path, cmd_path, cosing_path,
 
     else:
         df_res = lookup_all_english(ing_list, match_dict_fuzzy, match_dict_cosing, df_inci, df_cosing)
+
+    if debug:
+        print(df_res)
 
     return df_res, model_input
 
