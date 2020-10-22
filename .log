@@ -3794,3 +3794,11 @@
 2020-10-21 23:01:16,801 [91473] DEBUG    root:197: [JupyterRequire] Configuration requested: {'paths': {}, 'shim': None}
 2020-10-21 23:01:16,803 [91473] INFO     root:271: [JupyterRequire] Comms have been successfully initialized.
 2020-10-21 23:01:16,808 [91473] DEBUG    root:97: [JupyterRequire] Registering comm targets.
+2020-10-22 15:52:00,895 [42106] DEBUG    root:75: [JupyterRequire] Loading Jupyter Require extension.
+2020-10-22 15:52:00,896 [42106] DEBUG    root:93: [JupyterRequire] Initializing comms.
+2020-10-22 15:52:00,896 [42106] INFO     root:247: [JupyterRequire] Initializing comms.
+2020-10-22 15:52:00,899 [42106] DEBUG    root:197: [JupyterRequire] Configuration requested: {'paths': {}, 'shim': None}
+2020-10-22 15:52:00,900 [42106] INFO     root:271: [JupyterRequire] Comms have been successfully initialized.
+2020-10-22 15:52:00,900 [42106] DEBUG    root:97: [JupyterRequire] Registering comm targets.
+2020-10-22 16:27:01,512 [42106] DEBUG    parso.cache:166: [JupyterRequire] pickle loaded: /Users/macbookpro/miniconda3/envs/cs_ftmle/lib/python3.7/site-packages/jedi/third_party/typeshed/stdlib/2and3/builtins.pyi
+2020-10-22 16:27:01,582 [42106] DEBUG    parso.cache:166: [JupyterRequire] pickle loaded: /Users/macbookpro/miniconda3/envs/cs_ftmle/lib/python3.7/site-packages/jedi/third_party/typeshed/stdlib/3/sys.pyi
