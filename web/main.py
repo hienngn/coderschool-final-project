@@ -34,6 +34,8 @@ from past.utils import old_div
 
 from PIL import Image, ImageEnhance
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # INFO and WARNING messages are not printed
+
 UPLOAD_FOLDER = 'static/img/uploads/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -48,6 +50,19 @@ checkpoint_path = 'checkpoints_mlt/'
 
 app = Flask(__name__)
 
+with open('db/ingredient_idx.pickle', 'rb') as handle:
+    ingredient_idx = pickle.load(handle)
+
+with open('db/ingredient_idx_1000.pickle', 'rb') as handle:
+    ingredient_idx_1000 = pickle.load(handle)
+
+with open('db/rf_200.pkl', 'rb') as mdrf:
+    reload_rf = pickle.load(mdrf)
+
+with open('db/recommendation.pkl', 'rb') as recomm:
+    reload_knn = pickle.load(recomm)
+
+df_recommendation = pd.read_csv('db/recommendation_pool.csv')
 
 @app.route('/')
 def index():
@@ -80,12 +95,24 @@ def predict():
 
     ctpn_img, ctpn_txt = ctpn(dw_img_path)
     res, model_out = ocr_everything(dw_img_path, ctpn_txt, 'db/ingredient_inci_1570.csv', 'db/ingredient_vietnamese_3818.csv', 'db/ingredient_cosing_37309.csv', lang_set, debug=True)
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        print("------")
-        print(res)
 
+    input_rf, input_knn = transform(model_out)
+
+    prediction = reload_rf.predict(input_rf)
+
+    distances, indices = reload_knn.kneighbors(input_knn)
+    location = indices.tolist()[0]
+    df_recom = df_recommendation.iloc[location, :]
+
+    pred_list = prediction.tolist()
+    score = str(pred_list[0]) if len(pred_list) > 0 else "N/A"
+
+    # Get rid of NaNs
     res = res.fillna("")
-    return jsonify({'filename': ctpn_img, 'res': res.to_dict(orient='records')})
+    df_recom = df_recom.fillna("")
+
+    # with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+    return jsonify({'filename': ctpn_img, 'score': score, 'recom': df_recom.to_dict(orient='records'), 'res': res.to_dict(orient='records')})
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -1552,6 +1579,28 @@ def ocr_everything(img_path, boundingtxt_file, inci_path, cmd_path, cosing_path,
         print(df_res)
 
     return df_res, model_input
+
+def transform(X): # X: list
+    M = len(X)
+    N = len(ingredient_idx)
+    A = np.zeros((M, N), dtype=np.uint8)
+    i = 0
+    for ing_list in X:
+        x = np.zeros(N, dtype=np.uint8)
+        for ingredient in ing_list:
+            # Get the index for each ingredient
+            if ingredient in ingredient_idx.keys():
+                idx = ingredient_idx[ingredient]
+                x[idx] = 1
+            else:
+                pass
+
+        A[i, :] = x
+        i += 1
+    input_rf = A[:, :1000]
+    input_knn = A
+
+    return input_rf, input_knn
 
 
 if __name__ == '__main__':

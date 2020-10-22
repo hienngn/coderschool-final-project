@@ -24,6 +24,8 @@ function callPredict(lang) {
 
   showInfoBar();
   $('#result').empty();
+  $('#scorebox').hide();
+  $('#scorearea').empty();
   document.getElementById('prodpic').src = "";
   fetch('/predict/', {
     method: 'POST',
@@ -36,12 +38,16 @@ function callPredict(lang) {
     }
     // document.getElementById('result').innerHTML=genIngTable(res);
     $('#result').append(genIngTable(data['res']));
+    $('#scorebox').show();
+    $('#scorearea').append(data['score']);
     document.getElementById('prodpic').src = data['filename'];
     document.getElementById('prodpic').style.display = "inline-block";
     hideInfoBar();
   })
     .catch(error => {
       $('#result').empty();
+      $('#scorebox').hide();
+      $('#scorearea').empty();
       document.getElementById('prodpic').src = "";
       document.getElementById('prodpic').style.display = "none";
       hideInfoBar();
