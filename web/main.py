@@ -4,6 +4,7 @@ from flask import Flask, render_template, jsonify, request
 import uuid
 import os
 import re
+import pickle
 import sys
 import time
 import datetime
@@ -18,7 +19,6 @@ import tensorflow as tf
 from pytesseract import Output
 from tqdm import tqdm
 from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
 
 import nltk
 nltk.download('stopwords')
@@ -1055,11 +1055,12 @@ def ctpn(imgfile):
     tf.reset_default_graph()
     return output_img_file, txt_file
 
+# OCR SHIT STARTS HERE
 def get_bounding_box(txt):
     annotation = txt
     with open(annotation, "r") as file1:
         bounding_boxes = file1.read()
-        
+
     bounding_boxes = bounding_boxes.split('\n')[:-1]
     boxes = [i.split(',')[:-1] for i in bounding_boxes]
 
@@ -1070,15 +1071,425 @@ def get_bounding_box(txt):
             num = int(each)
             if i in [0, 1, 3, 6]:
                 num -= 3
-            else: 
+            else:
                 num += 3
             new_box.append(num)
         new_boxes.append(new_box)
     new_boxes.sort(key=lambda x: x[1])
-    
+
     return new_boxes
 
+def clean_string(string):
+    text = string.replace('INACTIVE INGREDIENTS:', '') # added
+    text = text.replace('ACTIVE INGREDIENTS:', '') # added
+    text = text.split(':')[1]
 
+    pattern = "[\|\*\_\'\{}&]".format('"')
+    regex = re.compile('\\\S+')
+
+    text = re.sub(pattern, "", text)
+    text = re.sub(",, ", ", ", text)
+    text = re.sub(regex, " ", text)
+    text = re.sub('\.', " ", text)
+    text_tokens = word_tokenize(text)
+    text_wo_sw = [w for w in text_tokens if w not in stopwords.words()]
+    text = ' '.join(text_wo_sw)
+    text = text.strip()
+
+    return text
+
+def string_to_list(text):
+    pattern = "[\|\*\_\'\{}]".format('"')
+    text = re.sub(pattern, "", text)
+    split = [remove_water(x) for x in re.split("[,.]", text)]
+
+    return split
+
+def remove_water(string):
+    water = ['WATER (AQUA)', 'AQUA', 'EAU', 'AQUA/WATER/EAU', 'AQUA / WATER / EAU',
+             'PURIFIED WATER', 'DISTILLED WATER', 'D.I. WATER', 'AQUA (WATER)', 'AQUA (PURIFIED)']
+    text = string.upper()
+    if text in water:
+        text = 'WATER'
+    text = text.strip('  ')
+
+    return text
+
+def crop_line(img_path, box):
+    img = cv2.imread(img_path)
+    img, (rh, rw) = resize_image(img)
+    # points for test.jpg
+    cnt = np.array([
+        [[box[0], box[1]]],
+        [[box[2], box[3]]],
+        [[box[4], box[5]]],
+        [[box[6], box[7]]]
+    ])
+    # print("shape of cnt: {}".format(cnt.shape))
+    rect = cv2.minAreaRect(cnt)
+#     print("rect: {}".format(rect))
+
+    # the order of the box points: bottom left, top left, top right,
+    # bottom right
+    box = cv2.boxPoints(rect)
+    box = np.int0(box)
+
+    # print("bounding box: {}".format(box))
+    cv2.drawContours(img, [box], 0, (0, 0, 255), 2)
+
+    # get width and height of the detected rectangle
+    width = int(rect[1][0])
+    height = int(rect[1][1])
+    angle = rect[2]
+
+    src_pts = box.astype("float32")
+    # coordinate of the points in box points after the rectangle has been
+    # straightened
+    dst_pts = np.array([[0, height + 2],
+        [0, 0],
+        [width, 0],
+        [width, height + 2]], dtype="float32")
+
+    # the perspective transformation matrix
+    M = cv2.getPerspectiveTransform(src_pts, dst_pts)
+
+    # directly warp the rotated rectangle to get the straightened rectangle
+    warped = cv2.warpPerspective(img, M, (width, height))
+
+    # cv2.imwrite("crop_img.jpg", warped)
+
+    # cv2.waitKey(0)
+    if angle < -45:
+        warped = np.transpose(warped, (1, 0, 2))
+        warped = warped[::-1]
+
+#     cv2.imshow('croped', warped)
+#     cv2.waitKey(0)
+#     cv2.destroyAllWindows()
+    return warped
+
+def ocr(img, oem=3, psm=6):
+    """
+    @param img: The image to be OCR'd
+    @param oem: for specifying the type of Tesseract engine( default=1 for LSTM OCR Engine)
+    """
+    config = ('-l eng --oem {oem} --psm {psm}'.format(oem=oem, psm=psm))
+    # config = ('-l eng --tessdata-dir "/usr/share/tesseract-ocr/tessdata" --oem {oem} -- psm {psm}'.format(oem=oem,psm=psm))
+    try:
+        # img = Image.fromarray(img)
+        text = pytesseract.image_to_string(img, config=config)
+        return text
+    except:
+        return ""
+
+class FuzzyDict(dict):
+    "Provides a dictionary that performs fuzzy lookup"
+    def __init__(self, items=None, cutoff=.6):
+        """Construct a new FuzzyDict instance
+
+        items is an dictionary to copy items from (optional)
+        cutoff is the match ratio below which mathes should not be considered
+        cutoff needs to be a float between 0 and 1 (where zero is no match
+        and 1 is a perfect match)"""
+        super(FuzzyDict, self).__init__()
+
+        if items:
+            self.update(items)
+        self.cutoff = cutoff
+
+        # short wrapper around some super (dict) methods
+        self._dict_contains = lambda key: \
+            super(FuzzyDict, self).__contains__(key)
+
+        self._dict_getitem = lambda key: \
+            super(FuzzyDict, self).__getitem__(key)
+
+    def _search(self, lookfor, stop_on_first=False):
+        """Returns the value whose key best matches lookfor
+
+        if stop_on_first is True then the method returns as soon
+        as it finds the first item
+        """
+
+        # if the item is in the dictionary then just return it
+        if self._dict_contains(lookfor):
+            return True, lookfor, self._dict_getitem(lookfor), 1
+
+        # set up the fuzzy matching tool
+        # ratio_calc = difflib.SequenceMatcher()
+        # ratio_calc.set_seq1(lookfor)
+
+        # test each key in the dictionary
+        best_ratio = 0
+        best_match = None
+        best_key = None
+        for key in self:
+
+            # if the current key is not a string
+            # then we just skip it
+            if not isinstance(key, str):
+                continue
+
+            # we get an error here if the item to look for is not a
+            # string - if it cannot be fuzzy matched and we are here
+            # this it is defintely not in the dictionary
+            try:
+                # calculate the match value
+                ratio = fuzz.ratio(lookfor, key) / 100
+            except TypeError:
+                break
+
+            # if this is the best ratio so far - save it and the value
+            if ratio > best_ratio:
+                best_ratio = ratio
+                best_key = key
+                best_match = self._dict_getitem(key)
+
+            if stop_on_first and ratio >= self.cutoff:
+                break
+
+        return (
+            best_ratio >= self.cutoff,
+            best_key,
+            best_match,
+            best_ratio)
+
+    def __contains__(self, item):
+        "Overides Dictionary __contains__ to use fuzzy matching"
+        if self._search(item, True)[0]:
+            return True
+        else:
+            return False
+
+    def __getitem__(self, lookfor):
+        "Overides Dictionary __getitem__ to use fuzzy matching"
+        matched, key, item, ratio = self._search(lookfor)
+
+        if not matched:
+            raise KeyError(
+                "'%s'. closest match: '%s' with ratio %.3f" % (str(lookfor), str(key), ratio))
+
+        return item
+
+def fuzzy_match_ingredients(ing_list, fuzdict):
+    match_dict = {}
+    for ing in tqdm(ing_list):
+        if ing in match_dict.keys():
+            continue
+        upper_ing = ing.upper()
+        if fuzdict.__contains__(upper_ing):
+            match_dict[ing] = fuzdict[upper_ing]
+        else:
+            match_dict[ing] = 'unknown'
+
+    return match_dict
+
+def create_dict_english(df_inci, df_cosing):
+    rating_inci = {}
+    irritancy_inci = {}
+    comedogenicity_inci = {}
+    function_inci = {}
+    qfacts_inci = {}
+    desc_inci = {}
+
+    desc_cosing = {}
+    function_cosing = {}
+
+    for idx, row in tqdm(df_inci.iterrows()):
+        for name in row['ingredient_name'].split('/'):
+            chem_name = name.strip()
+            rating_inci[chem_name] = row['rating']
+            irritancy_inci[chem_name] = row['irritancy']
+            comedogenicity_inci[chem_name] = row['comedogenicity']
+            function_inci[chem_name] = row['functions']
+            qfacts_inci[chem_name] = row['quick_facts']
+            desc_inci[chem_name] = row['description']
+
+    for idx, row in tqdm(df_cosing.iterrows()):
+        for name in row['ingredient_name'].split('/'):
+            desc_cosing[name] = row['description']
+            function_cosing[name] = row['functions']
+
+    return rating_inci, irritancy_inci, comedogenicity_inci, function_inci, qfacts_inci, desc_inci, desc_cosing, function_cosing
+
+def lookup_all_english(ingredient_list, match_dict_inci, match_dict_cosing,
+               df_inci, df_cosing, option=''):
+
+    with open('pickles/eng_rating_inci.pickle', 'rb') as handle:
+        rating_inci = pickle.load(handle)
+    with open('pickles/eng_irritancy_inci.pickle', 'rb') as handle:
+        irritancy_inci = pickle.load(handle)
+    with open('pickles/eng_comedogenicity_inci.pickle', 'rb') as handle:
+        comedogenicity_inci = pickle.load(handle)
+    with open('pickles/eng_function_inci.pickle', 'rb') as handle:
+        function_inci = pickle.load(handle)
+    with open('pickles/eng_qfacts_inci.pickle', 'rb') as handle:
+        qfacts_inci = pickle.load(handle)
+    with open('pickles/eng_desc_inci.pickle', 'rb') as handle:
+        desc_inci = pickle.load(handle)
+    with open('pickles/eng_desc_cosing.pickle', 'rb') as handle:
+        desc_cosing = pickle.load(handle)
+    with open('pickles/eng_function_cosing.pickle', 'rb') as handle:
+        function_cosing = pickle.load(handle)
+
+    res = []
+
+    for item in tqdm(ingredient_list):
+
+        value = match_dict_inci[item]
+        if value == 'unknown':
+            key = match_dict_cosing.get(item, 'unknown')
+            rating = 'No rating'
+            irritancy = np.nan
+            comedogenicity = np.nan
+            functions = function_cosing.get(key, [])
+            quickfacts = np.nan
+            description = desc_cosing.get(key, [])
+
+        else:
+            key = match_dict_inci.get(item, 'unknown')
+            rating = rating_inci.get(key, 'No rating')
+            irritancy = irritancy_inci.get(key, np.nan)
+            comedogenicity = comedogenicity_inci.get(key, np.nan)
+            functions = function_inci.get(key, [])
+            quickfacts = qfacts_inci.get(key, [])
+            description = desc_inci.get(key, [])
+
+        if key != 'unknown':
+            if option == 'ingredient':
+                res.append(key)
+            elif option == 'rating':
+                res.append(rating)
+            elif option == 'irritancy':
+                res.append(irritancy)
+            elif option == 'comedogenicity':
+                res.append(comedogenicity)
+            elif option == 'functions':
+                res.append(functions)
+            elif option == 'quickfacts':
+                res.append(quickfacts)
+            elif option == 'description':
+                res.append(description)
+            else:
+                res.extend([[key, functions, rating, irritancy, comedogenicity, quickfacts, description]])
+
+    df_res = pd.DataFrame(res, columns=['Ingredient_name', 'Functions', 'Rating', 'Irritancy',
+                                        'Comedogenicity', 'Quick_facts', 'Description'])
+    return df_res
+
+def lookup_all_vietnamese(ingredient_list, match_dict_cmd, match_dict_cosing,
+               df_cmd, df_cosing, option=''):
+
+    with open('pickles/vie_ratingscore_cmd.pickle', 'rb') as handle:
+        ratingscore_cmd = pickle.load(handle)
+    with open('pickles/vie_function_cmd.pickle', 'rb') as handle:
+        function_cmd = pickle.load(handle)
+    with open('pickles/vie_desc_cmd.pickle', 'rb') as handle:
+        desc_cmd = pickle.load(handle)
+
+    with open('pickles/eng_desc_cosing.pickle', 'rb') as handle:
+        desc_cosing = pickle.load(handle)
+    with open('pickles/eng_function_cosing.pickle', 'rb') as handle:
+        function_cosing = pickle.load(handle)
+
+    res = []
+
+    for item in tqdm(ingredient_list):
+
+        value = match_dict_cmd[item]
+
+        if value == 'unknown':
+            key = match_dict_cosing.get(item, 'unknown')
+            rating_score = 'Chưa đánh giá'
+            functions = function_cosing.get(key, [])
+            description = desc_cosing.get(key, [])
+        else:
+            key = match_dict_cmd.get(item, 'unknown')
+            rating_score = ratingscore_cmd.get(key, np.nan)
+            functions = function_cmd.get(key, [])
+            description = desc_cmd.get(key, [])
+
+        if key != 'unknown':
+            if option == 'ingredient':
+                res.append(key)
+            elif option == 'rating_score':
+                res.append(rating_score)
+            elif option == 'functions':
+                res.append(functions)
+            elif option == 'description':
+                res.append(description)
+            else:
+                res.extend([[key, rating_score, functions, description]])
+
+    df_res = pd.DataFrame(res, columns=['Ingredient_name', 'Rating_score', 'Functions', 'Description'])
+
+    return df_res
+
+# OK THE GREAT OCR FUNCTION
+def ocr_everything(img_path, boundingtxt_file, inci_path, cmd_path, cosing_path, language, debug=False):
+    boxes = get_bounding_box(boundingtxt_file)
+
+    # doing OCR
+    text = ''
+    for box in boxes:
+        cropped = crop_line(img_path, box)
+        string = ocr(cropped)
+        text = text + ' ' + str(string.strip('\n').strip('\x0c').strip())
+
+    if debug:
+        print(text)
+
+    # Cleaning result from OCR
+    text_result = clean_string(text)
+    ing_list = string_to_list(text_result)
+
+    if debug:
+        print("-----")
+        print(text_result)
+
+    # Loading ingredient dataframe
+
+    df_cosing = pd.read_csv(cosing_path) # '../Database/ingredient_cosing_37309.csv'
+    # fd_cosing
+    cosing_dict = {name.strip(): name.strip() for name in df_cosing['ingredient_name']}
+    fd_cosing = FuzzyDict(cosing_dict, cutoff=.6)
+    match_dict_cosing = fuzzy_match_ingredients(ing_list, fd_cosing)
+
+    # Input for later models: KNN and randomforest
+    model_input = [[name for name in match_dict_cosing.values()]]
+
+    # fd main
+    if language == 'Vietnamese':
+        df_cmd = pd.read_csv(cmd_path) # Vietnamese database
+        cmd_dict = {name.strip(): name.strip() for name in df_cmd['ingredient_name']}
+        fd_cmd = FuzzyDict(cmd_dict, cutoff=.7)
+        match_dict_fuzzy = fuzzy_match_ingredients(ing_list, fd_cmd)
+
+    else:
+        df_inci = pd.read_csv(inci_path) # '../Database/CALLMEDUY/ingredient_vietnamese_3818.csv'
+        inci_dict = {name.strip(): name.strip() for name in df_inci['ingredient_name']}
+        fd_inci = FuzzyDict(inci_dict, cutoff=.7)
+        match_dict_fuzzy = fuzzy_match_ingredients(ing_list, fd_inci)
+
+    # Compare product ingredient list and database
+    # match_dict = find_matching_ingredient(ing_list, rating, 0.55)
+
+    if debug:
+        print(match_dict_fuzzy)
+        print(list(match_dict_fuzzy.values()))
+
+    if debug:
+        print("length match_dict_fuzzy", len(match_dict_fuzzy))
+        print("length match_dict_extra", len(match_dict_cosing))
+
+    # Analyzing ingredient
+    if language == 'Vietnamese':
+        df_res = lookup_all_vietnamese(ing_list, match_dict_fuzzy, match_dict_cosing, df_cmd, df_cosing)
+
+    else:
+        df_res = lookup_all_english(ing_list, match_dict_fuzzy, match_dict_cosing, df_inci, df_cosing)
+
+    return df_res, model_input
 
 
 if __name__ == '__main__':
