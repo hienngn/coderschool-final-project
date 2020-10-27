@@ -1155,9 +1155,9 @@ def get_bounding_box(txt):
         for i, each in enumerate(box):
             num = int(each)
             if i in [0, 1, 3, 6]:
-                num -= 3
+                num -= 5
             else:
-                num += 3
+                num += 5
             new_box.append(num)
         new_boxes.append(new_box)
     new_boxes.sort(key=lambda x: x[1])
@@ -1178,6 +1178,7 @@ def clean_string(string):
     text = re.sub('\.', " ", text)
     text_tokens = word_tokenize(text)
     text_wo_sw = [w for w in text_tokens if w not in stopwords.words()]
+    # text = text.split(' : ')[-1]
     text = ' '.join(text_wo_sw)
     text = text.strip()
 
@@ -1191,8 +1192,8 @@ def string_to_list(text):
     return split
 
 def remove_water(string):
-    water = ['WATER (AQUA)', 'AQUA', 'EAU', 'AQUA/WATER/EAU', 'AQUA / WATER / EAU',
-             'PURIFIED WATER', 'DISTILLED WATER', 'D.I. WATER', 'AQUA (WATER)', 'AQUA (PURIFIED)']
+    water = ['WATER ( AQUA )', 'AQUA', 'EAU', 'AQUA / WATER / EAU', 'AQUA / WATER / EAU',
+             'PURIFIED WATER', 'DISTILLED WATER', 'D.I. WATER', 'AQUA ( WATER )', 'AQUA ( PURIFIED )']
     text = string.upper()
     if text in water:
         text = 'WATER'
@@ -1422,7 +1423,7 @@ def lookup_all_english(ingredient_list, match_dict_inci, match_dict_cosing,
         value = match_dict_inci[item]
         if value == 'unknown':
             key = match_dict_cosing.get(item, 'unknown')
-            rating = 'No rating'
+            rating = 'NO RATING'
             irritancy = np.nan
             comedogenicity = np.nan
             functions = function_cosing.get(key, [])
@@ -1431,7 +1432,7 @@ def lookup_all_english(ingredient_list, match_dict_inci, match_dict_cosing,
 
         else:
             key = match_dict_inci.get(item, 'unknown')
-            rating = rating_inci.get(key, 'No rating')
+            rating = rating_inci.get(key, 'NO RATING')
             irritancy = irritancy_inci.get(key, np.nan)
             comedogenicity = comedogenicity_inci.get(key, np.nan)
             functions = function_inci.get(key, [])
