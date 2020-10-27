@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class='flex flex-column w-100'>
-  <div class='w-50 ph3 center off-white-bg avenir'>
+  <div class='w-50 ph3 center off-white-bg avenir shadow-1'>
     <h1 class='f-headline-l f1-m f2'><span class='oren'>BO</span><span class='blu'>MB</span></h1>
     <h2 class='f1-l f2-m f3'><span class='coral'>BE ORGANICALLY</span> <span class='light-blu'>MORE BEAUTIFUL</span></h2>
 
@@ -20,8 +20,10 @@
     <img id='prodpic' style='display:none;max-width:500px;' src=''/>
     <div id='scorebox' class='pa4 mv3 ba br1 tc b--blue bg-lightest-blue' style='display:none;'><h1 class='f3 ttu tracked'>BOMB's Score</h1><div id='scorearea' class='f-headline fw7'></div><div class=''><p>(<strong>1-4</strong> is low hazard; <strong>5-7</strong> is moderate hazard; <strong>8-10</strong> is high hazard.)</p></div></div>
   </div>
-  <div class='w-100 avenir'>
-    <div class='mt2' id='result'></div>
+  <div class='w-100 flex flex-column items-center avenir'>
+    <div class='w-80-ns w-100'>
+      <div class='mt2' id='result'></div>
+    </div>
   </div>
   <div id='suggestionsbox' class='w-100 avenir off-white-bg'>
   </div>
